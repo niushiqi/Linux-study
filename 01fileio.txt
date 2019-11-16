@@ -1,0 +1,59 @@
+1 C标准函数与系统函数的区别
+    c - printf
+    linux                       /                          window
+    (目标)应用层API - write
+    内核层API - sys_write(根据文件描述符判断要调用的驱动函数)
+    驱动层 - uart_write(串口驱动)
+
+    1 缓冲区区别
+    C标准库函数 操作的是 文件缓冲区(文件流指针，输入输出错误)
+    buffer 8192B缓冲区 减少IO，提高效率
+    文件位置指针
+    文件描述符 指向硬盘文件
+    网络IO操作不需要缓冲区，LINUX API没有缓冲区
+
+    内核缓冲区，A写入，未刷新到磁盘，B程序可以读取到
+    C标准缓冲区，各个程序是独立的，B程序在缓冲区中无法读到
+
+    2 效率问题
+    很复杂，不确定
+
+2 PCB概念
+    用户空间 0-3G
+    内核空间 3G-4G
+    PCB属于内核空间，中有file_struct数组指针，存储该进程打开的设备文件列表(fopen打开文件)
+
+3 open/close
+    类似fopen，fclose
+    umask可以影响文件创建的权限
+    最大可以打开1024个文件 ulimit -n 4096 可以打开文件上限 cat /proc/sys/fs/file-max  一个请求相当打开一个文件
+
+5 阻塞非阻塞
+    linux标准输入 STDIN_FILENO
+    非阻塞-轮训模型 / 多路io复用模型
+    dev下设备文件 fb0-显卡 tty-当前终端
+
+    15 错误处理机制
+    errno - 整形，用户空间出错，内核设置errno值，api出错大多会设置
+    perror可以打印错误
+
+6 lseek
+    1.小tip: 作用拓展文件大小
+    修改偏移量后再写入，一定有写操作
+    查看二进制内容 od -tcx abc
+    whence - 基准 offset - 偏移量
+    2.小tip: 获取文件大小
+    lseek会返回长度
+
+7 fcntl
+    可以获取设置文件访问控制属性.修改flags - 所有文件都有的属性
+    设备文件列表 - file结构体(flags | pos) - 文件
+
+8 ioctl
+    如串口波特率属于设备文件的物理特性(/dev/ttyS0)，属性取决于驱动函数
+
+
+小实验：
+1.open打开最大数量个文件
+2.read write实现linux cp命令
+3.lseek创建一个10M的空文件
