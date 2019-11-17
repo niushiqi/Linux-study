@@ -1,0 +1,74 @@
+1 ext2
+    磁盘 扇区 512bytes
+    简单文件系统：
+    固定区域存储键值对 文件名-文件起始位置-大小 缺点：不灵活,大小分配预留位置不确定
+    linux文件系统设计：
+    一个个block(512bytes的整数倍 - 4096bytes)
+    硬件厂家约定好第一个block为boot block，存放分区信息，pc联盟规定1k字节，接下来的交给ext2管理
+    分组管理，组中
+    1：为超级块(super block)，描述分区信息
+    3：block为GDT(块组描述符表)，描述group信息(df命令)
+    1：块位图，比特位表示块是否被使用，决定group里面有多少块，决定group大小-64M
+    1：inode位图，记录inode使用情况
+    x：inode表，每个inode128Bytes(1个block存放8个inode，inode存放文件的属性)，由文件属性和数据指针(60Bytes-15指针)组成
+    x：数据块
+
+    hello文件存储过程：
+    group0里面存放hello文件，跳过超级块，检索GDT，找到inode位图，找到空闲编号，乘128算出inodb位置，申请inodb，存放文件属性，文件大小为0
+    写入"hello world"，开辟数据块，数据块指针存放inode表中，修改块位图
+    当文件超出12K，文件指针指向第13个块，block[12]是1级间接寻址指针，有1block/4指针长度(256指针)
+    通过3级寻址，能够保存16G文件
+    文件删除过程：
+    块位图清0，inode表中数据块指针清0，inode位图删除（数据恢复原理：数据还在数据块中，并没有删除，位图位修改）
+
+    创建/home目录过程：
+    ls -l看到目录大小4096Bytes
+    目录也是放在block中，目录存在记录项，存放文件名-inode号-记录长度-文件类型
+
+    /根目录必须存放在inode2中
+
+    打开文件/home/hello过程：
+    查找inode2，找到home记录项，找到home inode编号，找到hello记录项，找到hello inode编号，继续找到数据项
+
+    根据不同的需求，分配inode数量和数据块数量
+
+2 stat
+    atime(最近访问时间): - 打开文件退出
+    mtime:指最近修改文件内容的时间 - 修改文件内容
+    ctime:指最近改动Inode的时间 - chmod改动变化
+    Blocks: 物理扇区占用
+    lstat不跟踪符号链接
+
+7 link
+    link - 硬链接：指向inode(ln)
+    symlink - 软链接 - 符号链接：指向新inode，指向旧inode(ln -s)
+    ??创建临时文件
+    unlink(rm命令调用)
+
+9 chdir
+    (cd命令实现)
+
+13 虚拟文件系统
+    open/read/write
+    -----------------------
+    中间层 linux VFS
+    ntfs_open   ext3_open
+    -----------------------
+    ntfs        ext3         fat32
+
+    设备文件列表 - file结构体(flags | pos | f_op | f_dentry) - 文件
+    f_op:驱动层file_operations结构体
+    open/close/read/write...
+    f_dentry:文件系统驱动inode_operations
+    chmod/link/unlink...
+
+    两个进程打开同一个文件，不同的file结构体，会覆盖
+    一个进程打开同一个文件两次，不同的file结构体，会覆盖
+    一个进程打开同一个文件两次，相同的file结构体，不会覆盖：dup/dup2
+
+小实验：
+1.stat实现ls -l命令
+2.chmod实现chmod命令
+3.递归遍历目录tree命令
+4.标准输出重定向dup
+
