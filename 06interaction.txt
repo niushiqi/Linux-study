@@ -1,0 +1,27 @@
+1 终端
+    终端需要登录，成功得到shell
+    init->fork->exec->getty->用户输入账号->login->输入密码->exec->shell
+    tty-字符终端 pts-图形终端(tty7创建)
+    文件描述符0，1，2指向/dev/tty(变化)，指向当前终端
+        ttyname-获取当前终端文件名
+    PCB中记录控制终端是谁
+    进程不一定有终端，ps -aux TTY中会显示
+
+    ctrl+c执行原理
+        终端设备
+        终端设备驱动
+        线路规程 - 分发/捕获特殊按键
+        read/write系统调用 / 发送信号
+        用户进程
+
+    网络终端 - 执行原理
+    ssh
+
+2 进程组
+    组长进程标识:其进程组ID==其进程ID
+    进程组消亡：最后一个进程终止
+
+3 会话
+    执行cat | cat &
+    ps ajx 查看SID，cat和bash属于同一个会话，退出shell后，shell开启的进程会收到SIGHUP信号（通过会话id实现）
+    设置新的会话为了关掉终端能够继续运行

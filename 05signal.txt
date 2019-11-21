@@ -1,0 +1,67 @@
+1 概念
+    产生机制
+    终端特殊按键
+        ctrl+c  停止
+        ctrl+z  暂停
+            jobs 查看
+            fg 1 前台运行
+            bg 1 后台运行
+        ctrl+\  退出
+    硬件异常-程序运行中
+        char* str = "hello";    //指向不可变内存
+        CPU除0操作-浮点数例外 8:SIGFPE / 段错误-非法操作内存 11:SIGSEGV
+    kill函数，不能给root用户发信号
+        0-同组进程(fork出10个子进程，都在同一个进程组 ps -ajx)    负数(指定进程组)   -1(所有能收到信号的进程)
+    alarm-定时器
+        发送14信号
+
+2 处理
+    5种默认动作-term/core/ign-层级不同/stop/cont 大多数都是终止进程
+
+4 信号集
+    前32信号不支持排队，后32个支持排队
+    PCB -     PEND未决信号集        block阻塞信号集/屏蔽字
+              0-64位                                     -> handler 默认/忽略/捕捉
+           未决态：产生没有响应     控制信号阻塞-用户设置      递达态：信号产生并且被响应
+        用户不可设置，内核自动设置   2个信号不能阻塞
+
+    1.构建sigset_t信号集
+    2.sigprocmask注册信号屏蔽字
+    3.sigpending读取未决信号集
+
+5 信号捕捉
+    sigaction
+        (*sa_handler) SIG_DFL/SIG_IGN/旧函数
+        (*sa_sigaction) 新函数
+        sa_mask 调用捕捉函数临时设置,实现完之后立即生效/对应屏蔽字设置1（内核设置）
+        sa_flags 使用1还是2
+    信号执行时机-比中断优先级低
+        中断：时间片轮转
+        系统调用：read/wirte
+
+7 可重入函数
+    链表插入-头插法-不可重入
+    线程安全？
+
+8 时序竞态
+    pause - 挂起信号唤醒 / sleep=pause+alarm
+    先执行alarm，等待2s-cpu竞争，然后执行do_sig，然后执行pause()
+    改进版sigsuspend 解除阻塞+进程挂起=原子操作
+
+8 异步IO
+    全局变量 long long 八个字节
+    32位处理器两条汇编
+    1 movl
+    SIGNAL
+    2 movl
+    解决：
+        信号中使用原子类型sig_atomic_t
+        使用volatile - 编译器不优化，每次从内存读写
+
+10 向信号捕捉函数传参
+    之前：多进程+信号
+    现在：多线程（不和线程混一起）
+
+小实验；
+1.设置信号捕捉函数
+2。利用SIGUSR1和SIGUSR2实现父子进程同步输出 - 父子进程交替打印数字
