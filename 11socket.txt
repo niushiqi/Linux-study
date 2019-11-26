@@ -1,0 +1,33 @@
+0 socket
+    socket代表传递socket的一组函数
+
+    通信
+    socket pair
+    (文件描述符)ip+端口 - 协议栈打包    - -    协议栈解包 - (文件描述符)ip+端口
+    新文件描述符                                              connect
+       ||
+    加工车间[ipv4,TCP]   内核队列：刚刚3次握手成功(失败返回RST)
+       ||                        等待3次握手
+    [IP地址,端口号]
+       ||
+
+
+
+1 预备
+    0x12345678
+    网络字节序 : 大端存储 - 历史原因
+    0x8003
+    0x8002
+    0x8001
+    0x8000
+
+    sockaddr比ipv4地址早,sockaddr_in表示ipv4地址,通过前16位判断
+
+2 网络套接字函数
+    socket函数
+        SOCK_STREAM - TCP 数据有顺序，后一个先到等待前一个到来
+        SOCK_DGRAM - UDP 数据不可靠
+    listen函数
+        backlog:处在建立3次握手和刚刚握手成功队列的链接数和
+    accept函数
+        需要判断addrlen确定是ipv6还是ipv4

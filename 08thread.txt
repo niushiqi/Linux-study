@@ -1,0 +1,68 @@
+1 概念
+    从内核角度看进程和线程是相同的
+    内存管理 PCB PAGE 4096B 三级页表寻址
+    线程共用进程的页表，公用地址空间
+    PCB 内核栈(保存cpu寄存器的值)
+    查看线程方式ps -eLf / ps -Lw 5458 查看某一进程(LWP给调度器使用)
+
+    线程间共享资源
+    文件描述符，信号处理方式(处理函数)，pwd工作目录，uid和gid，内存地址空间0-3G
+    代码段，数据段(已经初始化的数据和全局变量)，bss段(未初始化的数据和全局变量)，堆(malloc申请内存)，共享库
+
+    共享库如何被加载到内存？
+        mmap映射 硬盘libmystack.so 到 内存(读和执行权限)
+
+    线程间非共享资源
+        线程id在进程内部有效，供进程识别
+        内核栈:处理器现场和栈指针
+        用户空间的栈
+        errno变量
+        信号屏蔽字
+        调度优先级
+
+2 线程原语
+    线程编译时需要添加库-lpthread
+    创建线程pthread_create
+        主线程的创建线程pthread_create返回tid不一定等于pthread_self
+        1.创建线程 2.线程号填写tid 3.返回函数调用
+    获取线程号pthread_self
+
+    exit关闭C标准文件流,刷新缓存区
+    _exit(linux底层函数)导致进程退出，关闭未关闭文件描述符
+
+    退出当前线程pthread_exit
+    进程wait函数 pthread_join
+    信号kill pthread_cancel(系统调用才会执行) / pthread_testcancel
+
+    设置线程为分离态pthread_detach
+    比较两个线程是否相等pthread_equal
+
+3 线程属性
+    设置线程的栈，警戒区-段错误-越界操作 pthread_attr_setstack
+    设置分离态 pthread_attr_setdetachstate
+
+小实验：
+1.一台机器创建更多线程
+    修改栈大小 ulimit -s 4096
+2.多线程拷贝文件
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

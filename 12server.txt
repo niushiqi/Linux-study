@@ -1,0 +1,66 @@
+1 多进程并发服务器 - 1千并发
+    server阻塞在read上,不能使用轮训模型(1千个服务器)
+    fork
+        父进程继续accept,子进程处理客户端数据
+
+    netstat -apn 查看连接情况
+
+    qq客户端(域名)  域名转换IP  qq服务器 IP+端口
+
+    客户端断开检测：
+    1. 设置内核属性，2小时未通信，发送检测包，客户端发送RST复位，服务器端断开连接
+    每隔75s，11次数
+    2. C/S心跳机制，心跳包检测客户端是否存活
+
+10.4 再议TCP
+    TCP状态:LISTEN,ESTABLISHED,FIN_WAIT_1,FIN_WAIT_2-半链接状态 (netstat -apn : State)
+    客户端 4次挥手结束:TIME_WAIT 端口不允许被重新使用,防止新进程使用端口造成歧义
+
+    解决丢包问题:滑动窗口
+
+3 多路io复用 - 单线程
+    select
+        把多个文件描述符(监听，读写)交给一个对象去监控，select-多路io转接，返回就绪的文件描述符个数
+        select设计比较早，最大监控文件描述符个数1024，设置变大导致效率很低，采用轮训模型，降低服务器响应效率
+        参数readfds - 传入传出参数
+        pselect：sigmask 对信号支持
+    poll
+        struct pollfd {
+            int fd;
+            short events;
+            short revents;
+        };
+        参数传入events，通过宏来定义属性POLLIN/POLLOUT，传出revents
+        不监控，fd设置为-1
+        可以调大文件描述符个数多监控
+    epoll
+        场景：连接数量多，活跃数量不多；大量活跃情况下提升并不明显
+        ready队列
+        epoll用树来实现，返回句柄root-文件描述符，提高插入删除查找效率
+
+4 线程池 - 复杂
+    1 每个线程都阻塞于accept上，当有客户端连接时，阻塞accept上的线程都被唤醒，竞争，只有一个线程去处理accept，其他线程继续阻塞
+        ip地址 端口号 -- listenfd(accept(listenfd, &addr, addrlen));
+    2 设置一个主控线程，主控线程accept，其他任务线程等待主控线程分配任务
+        条件变量，信号量
+    3 每个线程先争抢一把锁，谁抢到这把mutex，谁去accept
+        pthread_mutex_lock(&mutex);
+        accept(listenfd, &addr, &addlen);
+        pthread_mutex_unlock(&mutex);
+        处理客户端请求
+    设置临界值 max_work_num=1000 min_work_num=50 cur_work_num=? STATUS=BUSY
+    给一个线程发信号，会导致进程终止，线程共享处理方式，线程不共享屏蔽字
+
+5 UDP广播服务器
+    mac：fff 组地址
+    客户端ip地址无意义，但是端口号有意义
+    setsockopt-设置tcp keepalive时间
+    服务器：
+    struct ip_mregn group;
+    setsockopt(fd, IPPROTO_IP, IP_MULTICAST_IF, &group, sizeof(group));
+    客户端：
+    setsockopt(fd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &group, sizeof(group));
+
+
+小实验：
+    1.TCP状态转换 实验
