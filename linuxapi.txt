@@ -1,0 +1,139 @@
+文件I/O
+    open
+    close
+    read
+    write
+    lseek
+    fcntl
+    ioctl
+
+socket编程
+    htonl
+    inet_pton
+    socket
+    bind
+    listen
+    accept
+    connect
+    recvfrom
+    sendto
+
+高并发服务器
+    select
+    poll
+    epoll_create
+    epoll_ctl
+    epoll_wait
+
+线程
+    pthread_create
+    pthread_self
+    pthread_exit
+    pthread_join
+    pthread_cancel
+    pthread_detach
+    pthread_attr_init
+    pthread_attr_destroy
+    pthread_attr_setdetachstate
+    pthread_attr_setstackaddr
+    pthread_attr_setstacksize
+
+线程同步
+    互斥量
+    pthread_mutex_t
+    pthread_mutex_init
+    pthread_mutex_destroy
+    pthread_mutex_lock
+    pthread_mutex_trylock
+    pthread_mutex_unlock
+    读写锁
+    pthread_rwlock_t
+    pthread_rwlock_init
+    pthread_rwlock_destroy
+    pthread_rwlock_rdlock
+    pthread_rwlock_wrlock
+    pthread_rwlock_tryrdlock
+    pthread_rwlock_trywrlock
+    pthread_rwlock_unlock
+    条件变量 - 互斥量
+    pthread_cond_t
+    pthread_cond_init
+    pthread_cond_destroy
+    pthread_cond_wait
+    pthread_cond_timedwait
+    pthread_cond_signal
+    pthread_cond_broadcast
+    信号量(进程/线程)
+    sem_t
+    sem_init
+    sem_wait
+    sem_trywait
+    sem_timedwait
+    sem_post
+    sem_destroy
+    进程互斥量(进程)
+    pthread_mutexattr_init
+    pthread_mutexattr_setpshared
+    pthread_mutexattr_destroy
+    文件锁(进程)
+    f_lock
+
+进程
+    getenv
+    fork
+    getpid
+    gteppid
+    getuid
+    exec
+    wait
+    waitpid
+
+进程间关系，守护进程
+    getpgid
+    setsid
+
+信号
+    kill
+    sigset_t
+    sigprocmask
+    sigpending
+    signal
+    sigqueue
+    sigaction
+    sigsuspend
+
+文件系统
+    stat
+    chmod
+    chown
+    truncate
+    link
+    symlink
+    readlink
+    unlink
+    rename
+    chdir
+    getcwd
+    pathconf
+    mkdir
+    rmdir
+    opendir
+    telldir
+    seekdir
+    closedir
+    dup2
+
+进程间通信
+    pipe
+    mkfifo
+    mmap
+
+
+
+
+
+
+
+
+
+
