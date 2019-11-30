@@ -1,6 +1,8 @@
 ## linux系统网络编程学习笔记  
 ## 目录
 ***
+#### 资料
+1. [课件(pdf格式)](https://github.com/niushiqi/Linux-study/blob/master/%E8%AF%BE%E7%A8%8B%E8%AE%B2%E4%B9%89.pdf)
 #### 知识点
 1. [vim命令总结](https://github.com/niushiqi/Linux-study/blob/master/vim.txt)
 1. [markdown用法总结](https://github.com/niushiqi/Linux-study/blob/master/markdown.txt)
