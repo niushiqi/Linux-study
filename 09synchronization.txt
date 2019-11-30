@@ -1,0 +1,64 @@
+1 概念
+    协同一致，与时间有关的数据
+    出现原因：
+        1 数据共享
+        2 竞争
+        3 多个对象，没有合理的同步机制
+    锁：建议锁，不具有强制性
+
+2 互斥量
+    pthread_mutex_t:1 / 0
+        restrict:关键字，所有对指针指向内存修改的操作只能由本指针完成
+    pthread_mutex_init(=1)
+    pthread_mutex_destroy(=0)
+    pthread_mutex_lock(-1)
+    pthread_mutex_trylock(不阻塞)
+    pthread_mutex_unlock(+1)
+    锁的争抢：加锁粒度越小越好
+
+3 死锁
+    1 同一个互斥量加锁两次
+        第二次lock不会成功，会阻塞，第一次lock必须由自己unlock
+        解决：加锁之前判断
+    2 两把锁
+        拿着A锁请求B锁，拿着B锁请求A锁
+        解决：pthread_mutex_trylock拿不到所有锁释放已经占有的锁
+
+4 读写锁 - 一把锁
+    写独占 写只能有一个，读写等待
+    读共享 读可以多个，写等待
+    写优先级高 争抢先抢到
+
+5 条件变量-本身不是锁，与互斥锁配合使用
+    pthread_cond_t
+    pthread_cond_wait
+        三个作用：阻塞等待条件变量满足-释放已经掌握的互斥锁(原子操作)，唤醒时重新加锁(解除pthread_cond_signal,pthread_cond_broadcast)
+    pthread_cond_timedwait
+
+
+    (经典)生产消费者模型
+    思考:当pthread_cond_signal时候，假设所有消费者满足条件变量条件，但是此时只有一个消费者能够获取到互斥量，从而满足head == null的条件，然后执行
+        并释放互斥量，下一个消费者获取互斥量，但是已经不满足head == null条件，继续阻塞在条件变量上
+    while(head == null) {
+        pthread_cond_wait()
+    }
+
+    条件变量的优点：
+        减少竞争，消费者之间阻塞
+
+6 信号量 1->N
+    提升访问资源的数量,用于线程/进程
+        sem_wait 大于0，信号量--；等于0，线程阻塞
+        sem_post 信号量++，唤醒线程
+
+7 进程间同步
+    1 互斥量：修改属性，设置为进程间同步
+    2 文件锁 = 读写锁，多线程共享文件描述符，不可以用这个
+        struct flock lock;
+        lock.l_type = F_RDLOCK;
+        fcntl(fd, F_SETLKW, &lock);  加锁
+        lock.l_type = F_UNLOCK;
+        fcntl(fd, F_SETLKW, &lock);  解锁
+
+实验：
+1 编写程序实现死锁
