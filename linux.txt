@@ -1,0 +1,41 @@
+#yum
+安装软件
+yum install xmms-mp3
+
+更新软件
+yum list updates | grep unzip
+yum update unzip
+
+查看软件
+yum list installed | grep gdb
+yum info xmms-mp3
+
+卸载软件
+yum -y remove php*
+
+查看软件安装位置
+yum list installed | grep unzip
+rpm -ql unzip.x86_64
+
+gdb用法
+(默认上一条指令)
+
+gdb + filename 打开
+r 运行调试程序
+k 终止
+l 查看源码
+l - 向前查看
+b 加断点
+b 函数/行号
+b 文件:行号/函数
+info breakpoints 查看断点
+disable 1 断点失效
+delete 1 删除断点
+s 进入函数
+p 打印变量值
+p *array@len 打印数组
+set print pretty off 显示结构体
+ba 打印调用栈
+display 自动显示
+undisplay 序号 自动显示
+c 继续执行
